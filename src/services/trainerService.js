@@ -2,24 +2,24 @@ const pool = require('../config/db');
 const ApiError = require('../utils/ApiError');
 const loadSql = require('../utils/loadSql');
 
-const Q = loadSql('members.sql');
+const Q = loadSql('trainers.sql');
 
-const getMembers = async () => {
+const getTrainers = async () => {
   const result = await pool.query(Q.getAll);
   return result.rows;
 };
 
-const getMemberById = async (id) => {
+const getTrainerById = async (id) => {
   const result = await pool.query(Q.getById, [id]);
-  if (result.rows.length === 0) throw new ApiError(404, 'Member not found');
+  if (result.rows.length === 0) throw new ApiError(404, 'Trainer not found');
   return result.rows[0];
 };
 
-const updateMember = async (id, fields) => {
+const updateTrainer = async (id, fields) => {
   const existing = await pool.query(Q.checkExists, [id]);
-  if (existing.rows.length === 0) throw new ApiError(404, 'Member not found');
+  if (existing.rows.length === 0) throw new ApiError(404, 'Trainer not found');
 
-  const { phone, gender, date_of_birth, address, emergency_contact, profile_image_url, full_name, status } = fields;
+  const { specialization, bio, hire_date, full_name, status } = fields;
   const userId = existing.rows[0].user_id;
 
   if (full_name || status) {
@@ -32,16 +32,14 @@ const updateMember = async (id, fields) => {
     await pool.query(`UPDATE users SET ${updates.join(', ')} WHERE id = $${idx}`, values);
   }
 
-  const result = await pool.query(Q.updateProfile, [
-    phone, gender, date_of_birth, address, emergency_contact, profile_image_url, id,
-  ]);
+  const result = await pool.query(Q.updateProfile, [specialization, bio, hire_date, id]);
   return result.rows[0];
 };
 
-const deleteMember = async (id) => {
+const deleteTrainer = async (id) => {
   const existing = await pool.query(Q.checkExists, [id]);
-  if (existing.rows.length === 0) throw new ApiError(404, 'Member not found');
+  if (existing.rows.length === 0) throw new ApiError(404, 'Trainer not found');
   await pool.query(Q.deleteByUserId, [existing.rows[0].user_id]);
 };
 
-module.exports = { getMembers, getMemberById, updateMember, deleteMember };
+module.exports = { getTrainers, getTrainerById, updateTrainer, deleteTrainer };
