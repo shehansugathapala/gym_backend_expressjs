@@ -3,11 +3,15 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
-const authRoutes = require('./routes/authRoutes');
-const memberRoutes = require('./routes/memberRoutes');
-const planRoutes = require('./routes/planRoutes');
+const authRoutes         = require('./routes/authRoutes');
+const memberRoutes       = require('./routes/memberRoutes');
+const planRoutes         = require('./routes/planRoutes');
+const trainerRoutes      = require('./routes/trainerRoutes');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const paymentRoutes      = require('./routes/paymentRoutes');
+const attendanceRoutes   = require('./routes/attendanceRoutes');
 
-const notFound = require('./middlewares/notFound');
+const notFound     = require('./middlewares/notFound');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -21,9 +25,13 @@ app.get('/test', (req, res) => {
   res.json({ success: true, message: 'API working' });
 });
 
-app.use('/api/auth', authRoutes);
-app.use('/api/members', memberRoutes);
-app.use('/api/plans', planRoutes);
+app.use('/api/auth',          authRoutes);
+app.use('/api/members',       memberRoutes);
+app.use('/api/plans',         planRoutes);
+app.use('/api/trainers',      trainerRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/payments',      paymentRoutes);
+app.use('/api/attendance',    attendanceRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
