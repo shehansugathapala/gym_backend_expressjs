@@ -9,9 +9,21 @@ const startServer = async () => {
     await pool.query('SELECT 1');
     console.log('✅ PostgreSQL Connected');
 
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
+
+    const shutdown = async (signal) => {
+      console.log(`\n${signal} received — shutting down gracefully`);
+      server.close(async () => {
+        await pool.end();
+        console.log('PostgreSQL pool closed');
+        process.exit(0);
+      });
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT',  () => shutdown('SIGINT'));
   } catch (error) {
     console.error('❌ DB Connection Error:', error.message);
     process.exit(1);

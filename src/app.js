@@ -17,13 +17,12 @@ const errorHandler = require('./middlewares/errorHandler');
 const app = express();
 
 app.use(helmet());
-app.use(cors());
-app.use(morgan('dev'));
-app.use(express.json());
-
-app.get('/test', (req, res) => {
-  res.json({ success: true, message: 'API working' });
-});
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? false : '*'),
+  credentials: true,
+}));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(express.json({ limit: '10kb' }));
 
 app.use('/api/auth',          authRoutes);
 app.use('/api/members',       memberRoutes);
