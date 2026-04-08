@@ -1,0 +1,413 @@
+{
+  "info": {
+    "name": "Workout Planner API",
+    "description": "Rule-based workout planner endpoints for GymPro backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "Set this after running the Login request"
+    },
+    {
+      "key": "member_id",
+      "value": "6",
+      "type": "string",
+      "description": "The members.id (not users.id)"
+    },
+    {
+      "key": "plan_id",
+      "value": "1",
+      "type": "string",
+      "description": "Set this from the Generate Plan response"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (Member)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('token', res.data.token);",
+                  "  console.log('Token saved:', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testmember2@gym.com\",\n  \"password\": \"Test@1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Workout Planner",
+      "item": [
+        {
+          "name": "Generate Plan — Lose Weight (Beginner, 3 days)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('success is true', () => pm.expect(res.success).to.be.true);",
+                  "pm.test('has schedule', () => pm.expect(res.data.plan.schedule.length).to.equal(3));",
+                  "if (res.data) pm.collectionVariables.set('plan_id', res.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goal\": \"lose_weight\",\n  \"level\": \"beginner\",\n  \"days_per_week\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/member/{{member_id}}/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "member", "{{member_id}}", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Generate Plan — Build Muscle (Intermediate, 5 days)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('success is true', () => pm.expect(res.success).to.be.true);",
+                  "pm.test('has 5 days schedule', () => pm.expect(res.data.plan.schedule.length).to.equal(5));",
+                  "pm.test('goal is build_muscle', () => pm.expect(res.data.goal).to.equal('build_muscle'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goal\": \"build_muscle\",\n  \"level\": \"intermediate\",\n  \"days_per_week\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/member/{{member_id}}/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "member", "{{member_id}}", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Generate Plan — Stay Fit (Beginner, 2 days)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('goal is stay_fit', () => pm.expect(res.data.goal).to.equal('stay_fit'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goal\": \"stay_fit\",\n  \"level\": \"beginner\",\n  \"days_per_week\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/member/{{member_id}}/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "member", "{{member_id}}", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Generate Plan — Endurance (Advanced, 4 days)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('goal is endurance', () => pm.expect(res.data.goal).to.equal('endurance'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goal\": \"endurance\",\n  \"level\": \"advanced\",\n  \"days_per_week\": 4\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/member/{{member_id}}/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "member", "{{member_id}}", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Get All Plans for Member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('success is true', () => pm.expect(res.success).to.be.true);",
+                  "pm.test('data is array', () => pm.expect(res.data).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/member/{{member_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "member", "{{member_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Plan by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('success is true', () => pm.expect(res.success).to.be.true);",
+                  "pm.test('has plan data', () => pm.expect(res.data).to.have.property('plan'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/{{plan_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "{{plan_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Plan by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('success is true', () => pm.expect(res.success).to.be.true);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/{{plan_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "{{plan_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Cases",
+      "item": [
+        {
+          "name": "Invalid Goal (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goal\": \"swim\",\n  \"level\": \"beginner\",\n  \"days_per_week\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/member/{{member_id}}/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "member", "{{member_id}}", "generate"]
+            }
+          }
+        },
+        {
+          "name": "days_per_week Out of Range (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('correct error message', () => pm.expect(pm.response.json().message).to.include('days_per_week'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goal\": \"stay_fit\",\n  \"level\": \"beginner\",\n  \"days_per_week\": 8\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/member/{{member_id}}/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "member", "{{member_id}}", "generate"]
+            }
+          }
+        },
+        {
+          "name": "No Token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goal\": \"stay_fit\",\n  \"level\": \"beginner\",\n  \"days_per_week\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/member/{{member_id}}/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "member", "{{member_id}}", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Plan Not Found (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('success is false', () => pm.expect(pm.response.json().success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/workout-planner/99999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workout-planner", "99999"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

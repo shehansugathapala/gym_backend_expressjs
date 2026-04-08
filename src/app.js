@@ -9,7 +9,8 @@ const planRoutes         = require('./routes/planRoutes');
 const trainerRoutes      = require('./routes/trainerRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const paymentRoutes      = require('./routes/paymentRoutes');
-const attendanceRoutes   = require('./routes/attendanceRoutes');
+const attendanceRoutes      = require('./routes/attendanceRoutes');
+const workoutPlannerRoutes  = require('./routes/workoutPlannerRoutes');
 
 const notFound     = require('./middlewares/notFound');
 const errorHandler = require('./middlewares/errorHandler');
@@ -30,7 +31,8 @@ app.use('/api/plans',         planRoutes);
 app.use('/api/trainers',      trainerRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/payments',      paymentRoutes);
-app.use('/api/attendance',    attendanceRoutes);
+app.use('/api/attendance',      attendanceRoutes);
+app.use('/api/workout-planner', workoutPlannerRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

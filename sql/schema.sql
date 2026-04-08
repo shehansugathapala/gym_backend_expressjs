@@ -11,6 +11,7 @@
 -- CLEAN UP: Drop existing tables in reverse dependency order
 -- ============================================================================
 
+DROP TABLE IF EXISTS workout_plans CASCADE;
 DROP TABLE IF EXISTS attendance CASCADE;
 DROP TABLE IF EXISTS payments CASCADE;
 DROP TABLE IF EXISTS subscriptions CASCADE;
@@ -211,6 +212,27 @@ CREATE TABLE IF NOT EXISTS attendance (
 -- Indexes for attendance queries and reporting
 CREATE INDEX idx_attendance_member_id ON attendance(member_id);
 CREATE INDEX idx_attendance_check_in ON attendance(check_in);
+
+
+-- ============================================================================
+-- TABLE: workout_plans
+-- ============================================================================
+-- Rule-based workout plans generated for members based on goal, fitness level,
+-- and available training days. Plan is stored as JSONB for flexible structure.
+
+CREATE TABLE IF NOT EXISTS workout_plans (
+    id SERIAL PRIMARY KEY,
+    member_id INT NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    goal VARCHAR(30) NOT NULL
+        CHECK (goal IN ('lose_weight', 'build_muscle', 'stay_fit', 'endurance')),
+    level VARCHAR(20) NOT NULL
+        CHECK (level IN ('beginner', 'intermediate', 'advanced')),
+    days_per_week INT NOT NULL CHECK (days_per_week BETWEEN 2 AND 6),
+    plan JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_workout_plans_member_id ON workout_plans(member_id);
 
 
 -- ============================================================================
