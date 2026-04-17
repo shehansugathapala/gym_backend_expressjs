@@ -41,4 +41,10 @@ const deleteMember = async (id) => {
   await pool.query(Q.deleteByUserId, [existing.rows[0].user_id]);
 };
 
-module.exports = { getMembers, getMemberById, updateMember, deleteMember };
+const getMemberByUserId = async (userId) => {
+  const result = await pool.query(Q.getByUserId, [userId]);
+  if (result.rows.length === 0) throw new ApiError(404, 'Member profile not found');
+  return result.rows[0];
+};
+
+module.exports = { getMembers, getMemberById, getMemberByUserId, updateMember, deleteMember };

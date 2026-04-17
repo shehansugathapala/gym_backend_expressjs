@@ -21,6 +21,11 @@ exports.updateMember = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, message: 'Member updated successfully', data: member });
 });
 
+exports.getMyProfile = asyncHandler(async (req, res) => {
+  const member = await memberService.getMemberByUserId(req.user.id);
+  res.status(200).json({ success: true, data: member });
+});
+
 exports.deleteMember = asyncHandler(async (req, res) => {
   await memberService.deleteMember(req.params.id);
   res.status(200).json({ success: true, message: 'Member deleted successfully' });
