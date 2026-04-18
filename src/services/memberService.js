@@ -22,14 +22,11 @@ const updateMember = async (id, fields) => {
   const { phone, gender, date_of_birth, address, emergency_contact, profile_image_url, full_name, status } = fields;
   const userId = existing.rows[0].user_id;
 
-  if (full_name || status) {
-    const updates = [];
-    const values = [];
-    let idx = 1;
-    if (full_name) { updates.push(`full_name = $${idx++}`); values.push(full_name); }
-    if (status)    { updates.push(`status = $${idx++}`);    values.push(status); }
-    values.push(userId);
-    await pool.query(`UPDATE users SET ${updates.join(', ')} WHERE id = $${idx}`, values);
+  if (full_name !== undefined || status !== undefined) {
+    await pool.query(
+      'UPDATE users SET full_name = COALESCE($1, full_name), status = COALESCE($2, status) WHERE id = $3',
+      [full_name ?? null, status ?? null, userId]
+    );
   }
 
   const result = await pool.query(Q.updateProfile, [
@@ -44,4 +41,10 @@ const deleteMember = async (id) => {
   await pool.query(Q.deleteByUserId, [existing.rows[0].user_id]);
 };
 
-module.exports = { getMembers, getMemberById, updateMember, deleteMember };
+const getMemberByUserId = async (userId) => {
+  const result = await pool.query(Q.getByUserId, [userId]);
+  if (result.rows.length === 0) throw new ApiError(404, 'Member profile not found');
+  return result.rows[0];
+};
+
+module.exports = { getMembers, getMemberById, getMemberByUserId, updateMember, deleteMember };

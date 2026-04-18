@@ -46,3 +46,14 @@ RETURNING *;
 
 -- :deleteByUserId
 DELETE FROM users WHERE id = $1;
+
+-- :getByUserId
+SELECT
+  m.*,
+  u.full_name,
+  u.email,
+  u.role,
+  u.status
+FROM members m
+JOIN users u ON u.id = m.user_id
+WHERE m.user_id = $1;

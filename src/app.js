@@ -9,7 +9,8 @@ const planRoutes         = require('./routes/planRoutes');
 const trainerRoutes      = require('./routes/trainerRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const paymentRoutes      = require('./routes/paymentRoutes');
-const attendanceRoutes   = require('./routes/attendanceRoutes');
+const attendanceRoutes      = require('./routes/attendanceRoutes');
+const workoutPlannerRoutes  = require('./routes/workoutPlannerRoutes');
 
 const notFound     = require('./middlewares/notFound');
 const errorHandler = require('./middlewares/errorHandler');
@@ -17,13 +18,12 @@ const errorHandler = require('./middlewares/errorHandler');
 const app = express();
 
 app.use(helmet());
-app.use(cors());
-app.use(morgan('dev'));
-app.use(express.json());
-
-app.get('/test', (req, res) => {
-  res.json({ success: true, message: 'API working' });
-});
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? false : '*'),
+  credentials: true,
+}));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(express.json({ limit: '10kb' }));
 
 app.use('/api/auth',          authRoutes);
 app.use('/api/members',       memberRoutes);
@@ -31,7 +31,8 @@ app.use('/api/plans',         planRoutes);
 app.use('/api/trainers',      trainerRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/payments',      paymentRoutes);
-app.use('/api/attendance',    attendanceRoutes);
+app.use('/api/attendance',      attendanceRoutes);
+app.use('/api/workout-planner', workoutPlannerRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
